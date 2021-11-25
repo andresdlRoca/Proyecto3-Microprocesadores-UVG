@@ -37,11 +37,12 @@ GPIO.setup(canalLed3, GPIO.OUT)
 dictMedicion = []
 
 def write_csv(datos_nuevos, filename="data.csv"):
-    
-    with open(filename, 'w') as fp:
+
+    with open(filename, 'a+') as fp:
         writer = csv.writer(fp)
-        for value in dictMedicion:
-            writer.writerow(value)
+        writer.writerow(dictMedicion)
+    
+    fp.close()
 
 
         
@@ -72,27 +73,30 @@ def main():
     
     print("El sensor detecto sonido " + str(ccc) + " veces")
 
-    dictMedicion.append(str(ccc))
-
-    write_csv(dictMedicion)
 
     if ccc == 0:
         print(" >> No se han detectado sonidos :c")
+        dictMedicion.append(0)
     elif ccc <= 2:
         print(" >> Se ha encendido 1 led!")
         GPIO.output(canalLed1, GPIO.HIGH)
+        dictMedicion.append(1)
     elif ccc == 3 or ccc == 4:
         print(" >> Se ha encendido 2 leds!")
         GPIO.output(canalLed1, GPIO.HIGH)
         GPIO.output(canalLed2, GPIO.HIGH)
+        dictMedicion.append(2)
     elif ccc > 4:
         print(" >> Se ha encendido 3 leds!")
         GPIO.output(canalLed1, GPIO.HIGH)
         GPIO.output(canalLed2, GPIO.HIGH)
         GPIO.output(canalLed3, GPIO.HIGH)
+        dictMedicion.append(3)
+
+    
 
     time.sleep(1)
-    opcion = int(input(" >> Presione 1 para volver a correr el programa\n    Presione 2 para apagar todas las leds\n    Presione 3 para salir"))
+    opcion = int(input(" >> Presione 1 para volver a correr el programa\n    Presione 2 para apagar todas las leds\n    Presione 3 para escribir el .csv y salir"))
     if opcion == 1:
         main()
     elif opcion == 2:
@@ -101,6 +105,7 @@ def main():
         GPIO.output(canalLed3, GPIO.LOW)
         main()
     elif opcion == 3:
+        write_csv(dictMedicion)
         time.sleep(2)
         print(" >> Gracias ")
         GPIO.output(canalLed1, GPIO.LOW)
